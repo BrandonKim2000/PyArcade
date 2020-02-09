@@ -1,8 +1,12 @@
-from pyarcade.mastermind import Mastermind
+from pyarcade.mastermind import MastermindGame
 import unittest
 
 
 class MastermindTestCase(unittest.TestCase):
-    def test_generate_random_sequence(self):
-        game = Mastermind()
-        self.assertEqual(len(game.generate_hidden_sequence()), 4)
+    def test_create_game_gives_unique_sequence(self):
+        session_ids = []
+        game = MastermindGame()
+        for idx in range(100):
+            session_ids.append(game.create_game({"game_id": 0})["session_id"])
+
+        self.assertEqual(len(set(session_ids)), 100)
