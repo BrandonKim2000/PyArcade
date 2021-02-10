@@ -14,10 +14,7 @@ class MastermindGame(GameInterface):
     sessions = 0
 
     def __init__(self):
-        self.nums = (0, 0, 0, 0)
-        self.guesses = []
-        self.session_id = 0
-        self.done = False
+        self.game = {"nums": (0, 0, 0, 0), "guesses": [], "session_id": 0, "done": False}
 
     def create_game(self, request: dict) -> dict:
         """ Upon calling create_game, the Mastermind game should initialize its hidden sequence
@@ -29,7 +26,7 @@ class MastermindGame(GameInterface):
             reply: dictionary containing the session_id in the request.
         """
         MastermindGame.sessions += 1
-        self.session_id = MastermindGame.sessions
+        self.game["session_id"] = MastermindGame.sessions
         i1 = random.randrange(0, 9)
         i2 = random.randrange(0, 9)
         while i2 == i1:
@@ -40,9 +37,9 @@ class MastermindGame(GameInterface):
         i4 = random.randrange(0, 9)
         while i4 == i1 or i4 == i2 or i4 == i3:
             i4 = random.randrange(0, 9)
-        self.nums = (i1, i2, i3, i4)
+        self.game["nums"] = (i1, i2, i3, i4)
 
-        return {"session_id": self.session_id}
+        return {"session_id": self.game["session_id"]}
 
     def read_game(self, request: dict) -> dict:
         """
