@@ -7,8 +7,8 @@ def main():
     input()
     game = MastermindGame()
     proxy = MastermindGameProxy(game)
-    dict = {"game_id": 0}
-    session = proxy.create_game(dict)
+    d = {"game_id": 0}
+    session = proxy.create_game(d)
     session_id = session["session_id"]
     game_in_session = True
     while (game_in_session):

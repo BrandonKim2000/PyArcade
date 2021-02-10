@@ -11,6 +11,7 @@ class MastermindGameProxy(GameInterface):
     Args:
         game_instance: A reference to the game being played.
     """
+
     def __init__(self, game_instance: MastermindGame):
         self.game_instance = game_instance
 
@@ -25,7 +26,13 @@ class MastermindGameProxy(GameInterface):
             integer unique to all ongoing game sessions. If the request is invalid, a session_id of
             zero should be returned. Otherwise, pass the request onto the game.
         """
-        return {}
+        if isinstance(request, dict):
+            if "session_id" in request.keys():
+                if isinstance(request["session_id"], int):
+                    if request["session_id"] != 0:
+                        return self.game_instance.create_game(request)
+
+        return {"session_id": 0}
 
     def read_game(self, request: dict) -> dict:
         """
@@ -38,7 +45,13 @@ class MastermindGameProxy(GameInterface):
             integer unique to all ongoing game sessions. If the request is invalid, a session_id of
             zero should be returned. Otherwise, pass the request onto the game.
         """
-        return {}
+        if isinstance(request, dict):
+            if "session_id" in request.keys():
+                if isinstance(request["session_id"], int):
+                    if request["session_id"] != 0:
+                        return self.game_instance.read_game(request)
+
+        return {"session_id": 0}
 
     def update_game(self, request: dict) -> dict:
         """
@@ -52,7 +65,16 @@ class MastermindGameProxy(GameInterface):
             integer unique to all ongoing game sessions. If the request is invalid, a session_id of
             zero should be returned. Otherwise, pass the request onto the game.
         """
-        return {}
+        if isinstance(request, dict):
+            if "session_id" in request.keys():
+                if isinstance(request["session_id"], int):
+                    if request["session_id"] != 0:
+                        if "guess" in request.keys():
+                            if isinstance(request["guess"], tuple):
+                                if list(map(type, request["guess"])) == [int, int, int, int]:
+                                    return self.game_instance.update_game(request)
+
+        return {"session_id": 0}
 
     def delete_game(self, request: dict) -> dict:
         """
@@ -65,4 +87,10 @@ class MastermindGameProxy(GameInterface):
             integer unique to all ongoing game sessions. If the session_id is invalid, then a session_id of
             zero is returned. Otherwise, pass the request onto the game.
         """
-        return {}
+        if isinstance(request, dict):
+            if "session_id" in request.keys():
+                if isinstance(request["session_id"], int):
+                    if request["session_id"] != 0:
+                        return self.game_instance.delete_game(request)
+
+        return {"session_id": 0}
