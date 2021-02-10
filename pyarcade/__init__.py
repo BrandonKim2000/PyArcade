@@ -13,9 +13,9 @@ def main():
     game_in_session = True
     while (game_in_session):
         proxy.read_game({"session_id", session_id})
-        guess = input("Enter your guess as four integers separated by spaces")
+        guess = input("Enter your guess as four integers separated by spaces\n")
         guess = guess.split(" ")
-
+        
 
 
 if __name__ == "__main__":
