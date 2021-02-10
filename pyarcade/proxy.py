@@ -27,9 +27,9 @@ class MastermindGameProxy(GameInterface):
             zero should be returned. Otherwise, pass the request onto the game.
         """
         if isinstance(request, dict):
-            if "session_id" in request.keys():
-                if isinstance(request["session_id"], int):
-                    if request["session_id"] != 0:
+            if "game_id" in request.keys():
+                if isinstance(request["game_id"], int):
+                    if request["game0 _id"] == 0:
                         return self.game_instance.create_game(request)
 
         return {"session_id": 0}

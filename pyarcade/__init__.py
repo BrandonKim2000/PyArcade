@@ -12,10 +12,11 @@ def main():
     session_id = session["session_id"]
     game_in_session = True
     while (game_in_session):
-        proxy.read_game({"session_id", session_id})
+        proxy.read_game({"session_id": session_id})
         guess = input("Enter your guess as four integers separated by spaces\n")
         guess = guess.split(" ")
-        
+        guess = tuple([int(i) for i in guess])
+        print(proxy.update_game({"session_id": session_id, "guess": guess}))
 
 
 if __name__ == "__main__":
