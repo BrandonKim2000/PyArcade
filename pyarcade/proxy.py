@@ -29,7 +29,7 @@ class MastermindGameProxy(GameInterface):
         if isinstance(request, dict):
             if "game_id" in request.keys():
                 if isinstance(request["game_id"], int):
-                    if request["game0 _id"] == 0:
+                    if request["game_id"] == 0:
                         return self.game_instance.create_game(request)
 
         return {"session_id": 0}

@@ -16,7 +16,10 @@ def main():
         guess = input("Enter your guess as four integers separated by spaces\n")
         guess = guess.split(" ")
         guess = tuple([int(i) for i in guess])
-        print(proxy.update_game({"session_id": session_id, "guess": guess}))
+        res = proxy.update_game({"session_id": session_id, "guess": guess})
+        print(res)
+        if res["done"]:
+            game_in_session = False
 
 
 if __name__ == "__main__":
