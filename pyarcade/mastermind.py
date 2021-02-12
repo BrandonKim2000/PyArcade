@@ -1,3 +1,5 @@
+import random
+
 from pyarcade.game_interface import GameInterface
 
 
@@ -8,8 +10,11 @@ class MastermindGame(GameInterface):
         For now, Mastermind must have a hidden sequence of length 4 in which all 4 integers may take on values
         between 0 and 9.
     """
+
+    sessions = 0
+
     def __init__(self):
-        pass
+        self.games = {}
 
     def create_game(self, request: dict) -> dict:
         """ Upon calling create_game, the Mastermind game should initialize its hidden sequence
@@ -20,7 +25,22 @@ class MastermindGame(GameInterface):
          Returns:
             reply: dictionary containing the session_id in the request.
         """
-        return {}
+        MastermindGame.sessions += 1
+        self.games[MastermindGame.sessions] = {"guesses": [], "session_id": 0, "done": False}
+        self.games[MastermindGame.sessions]["session_id"] = MastermindGame.sessions
+        i1 = random.randrange(0, 9)
+        i2 = random.randrange(0, 9)
+        while i2 == i1:
+            i2 = random.randrange(0, 9)
+        i3 = random.randrange(0, 9)
+        while i3 == i1 or i3 == i2:
+            i3 = random.randrange(0, 9)
+        i4 = random.randrange(0, 9)
+        while i4 == i1 or i4 == i2 or i4 == i3:
+            i4 = random.randrange(0, 9)
+        self.games[MastermindGame.sessions]["nums"] = (i1, i2, i3, i4)
+
+        return {"session_id": self.games[MastermindGame.sessions]["session_id"]}
 
     def read_game(self, request: dict) -> dict:
         """
@@ -40,7 +60,8 @@ class MastermindGame(GameInterface):
             So the overall reply could look like:
             {"guesses": [((0, 1, 2, 3), (1, 2), ((3, 2, 1, 0), (2, 1))], "session_id": 1, "done": False}
         """
-        return {}
+
+        return {"guesses": self.games[request["session_id"]]["guesses"], "session_id": self.games[request["session_id"]]["session_id"], "done": self.games[request["session_id"]]["done"]}
 
     def update_game(self, request: dict) -> dict:
         """
@@ -61,7 +82,19 @@ class MastermindGame(GameInterface):
             So the overall reply could look like:
             {"guesses": [((0, 1, 2, 3), (1, 2), ((3, 2, 1, 0), (2, 1))], "session_id": 1, "done": False}
         """
-        return {}
+        cows = 0
+        bulls = 0
+        for i in range(4):
+            if request["guess"][i] == self.games[request["session_id"]]["nums"][i]:
+                bulls += 1
+            elif request["guess"][i] in self.games[request["session_id"]]["nums"]:
+                cows += 1
+
+        self.games[request["session_id"]]["guesses"].append((request["guess"], (cows, bulls)))
+        if bulls == 4:
+            self.games[request["session_id"]]["done"] = True
+
+        return {"guesses": self.games[request["session_id"]]["guesses"], "session_id": self.games[request["session_id"]]["session_id"], "done": self.games[request["session_id"]]["done"]}
 
     def delete_game(self, request: dict) -> dict:
         """
@@ -72,4 +105,5 @@ class MastermindGame(GameInterface):
         Returns:
             reply: dictionary containing the session_id in the request.
         """
-        return {}
+        del self.games[request["session_id"]]
+        return {"session_id": request["session_id"]}
