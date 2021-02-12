@@ -52,3 +52,46 @@ class MastermindTestCase(unittest.TestCase):
         proxy.update_game({"session_id": session_id, "guess": sequence})
         done = proxy.read_game({"session_id": session_id})["done"]
         self.assertTrue(done)
+
+    def test_incorrect_input_create_game(self):
+        game = MastermindGame()
+        proxy = MastermindGameProxy(game)
+        ret = proxy.create_game({"game_id": 10})
+        self.assertEqual(ret, {"session_id": 0})
+
+    def test_incorrect_input_read_game(self):
+        game = MastermindGame()
+        proxy = MastermindGameProxy(game)
+        ret = proxy.read_game({"game_id": -10})
+        self.assertEqual(ret, {"session_id": 0})
+
+    def test_incorrect_session_id_update_game(self):
+        game = MastermindGame()
+        proxy = MastermindGameProxy(game)
+        session_id = proxy.create_game({"game_id": 0})["session_id"]
+        #ret = proxy.update_game({"session_id": -10, "guess": (1, 2, 3, 4)})
+        #self.assertEqual(ret, {"session_id": 0})
+
+    def test_extraneous_guess_update_game(self):
+        game = MastermindGame()
+        proxy = MastermindGameProxy(game)
+        session_id = proxy.create_game({"game_id": 0})["session_id"]
+        ret = proxy.update_game({"session_id": session_id, "guess": (1, 2, 3, 4, 5)})
+        self.assertEqual(ret, {"session_id": 0})
+
+    def test_game_played_extraneous_input(self):
+        game = MastermindGame()
+        proxy = MastermindGameProxy(game)
+        session_id = proxy.create_game({"game_id": 0, "extraneous input": "MONKEY"})["session_id"]
+        guess = game.games[session_id]["nums"]
+        proxy.update_game({"session_id": session_id, "guess": guess, "more extra input": "DOG"})
+        done = proxy.read_game({"session_id": session_id, "even more extra input": "DRAGON"})
+        self.assertTrue(done)
+
+    def test_incorrect_input_delete_game(self):
+        game = MastermindGame()
+        proxy = MastermindGameProxy(game)
+        session_id = proxy.create_game({"game_id": 0})["session_id"]
+        ret = proxy.delete_game({"session_id": -10})
+        #self.assertEqual({"session_id": 0}, ret)
+
