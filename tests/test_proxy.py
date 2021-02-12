@@ -41,8 +41,9 @@ class MastermindTestCase(unittest.TestCase):
         proxy = MastermindGameProxy(game)
         session_id = proxy.create_game({"game_id": 0})["session_id"]
         proxy.update_game({"session_id": session_id, "guess": (1, 2, 3, 4)})
+        self.assertTrue(session_id in game.games.keys())
         proxy.delete_game({"session_id": session_id})
-        #self.assertTrue(session_id not in game.games.keys())
+        self.assertTrue(session_id not in game.games.keys())
 
     def test_play_win_game(self):
         game = MastermindGame()
@@ -69,8 +70,8 @@ class MastermindTestCase(unittest.TestCase):
         game = MastermindGame()
         proxy = MastermindGameProxy(game)
         session_id = proxy.create_game({"game_id": 0})["session_id"]
-        #ret = proxy.update_game({"session_id": -10, "guess": (1, 2, 3, 4)})
-        #self.assertEqual(ret, {"session_id": 0})
+        ret = proxy.update_game({"session_id": -10, "guess": (1, 2, 3, 4)})
+        self.assertEqual(ret, {"session_id": 0})
 
     def test_extraneous_guess_update_game(self):
         game = MastermindGame()
@@ -93,5 +94,5 @@ class MastermindTestCase(unittest.TestCase):
         proxy = MastermindGameProxy(game)
         session_id = proxy.create_game({"game_id": 0})["session_id"]
         ret = proxy.delete_game({"session_id": -10})
-        #self.assertEqual({"session_id": 0}, ret)
+        self.assertEqual({"session_id": 0}, ret)
 
