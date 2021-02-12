@@ -48,7 +48,7 @@ class MastermindGameProxy(GameInterface):
         if isinstance(request, dict):
             if "session_id" in request.keys():
                 if isinstance(request["session_id"], int):
-                    if request["session_id"] != 0:
+                    if request["session_id"] in self.game_instance.games.keys():
                         return self.game_instance.read_game(request)
 
         return {"session_id": 0}
@@ -68,7 +68,7 @@ class MastermindGameProxy(GameInterface):
         if isinstance(request, dict):
             if "session_id" in request.keys():
                 if isinstance(request["session_id"], int):
-                    if request["session_id"] != 0:
+                    if request["session_id"] in self.game_instance.games.keys():
                         if "guess" in request.keys():
                             if isinstance(request["guess"], tuple):
                                 if list(map(type, request["guess"])) == [int, int, int, int]:
@@ -90,7 +90,7 @@ class MastermindGameProxy(GameInterface):
         if isinstance(request, dict):
             if "session_id" in request.keys():
                 if isinstance(request["session_id"], int):
-                    if request["session_id"] != 0:
+                    if request["session_id"] in self.game_instance.games.keys():
                         return self.game_instance.delete_game(request)
 
         return {"session_id": 0}

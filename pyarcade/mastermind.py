@@ -105,4 +105,5 @@ class MastermindGame(GameInterface):
         Returns:
             reply: dictionary containing the session_id in the request.
         """
-        return {}
+        del self.games[request["session_id"]]
+        return {"session_id": request["session_id"]}
