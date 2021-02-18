@@ -26,21 +26,10 @@ class MastermindGame(GameInterface):
             reply: dictionary containing the session_id in the request.
         """
         MastermindGame.sessions += 1
-        self.games[MastermindGame.sessions] = {"guesses": [], "session_id": 0, "done": False}
-        self.games[MastermindGame.sessions]["session_id"] = MastermindGame.sessions
-        i1 = random.randrange(0, 9)
-        i2 = random.randrange(0, 9)
-        while i2 == i1:
-            i2 = random.randrange(0, 9)
-        i3 = random.randrange(0, 9)
-        while i3 == i1 or i3 == i2:
-            i3 = random.randrange(0, 9)
-        i4 = random.randrange(0, 9)
-        while i4 == i1 or i4 == i2 or i4 == i3:
-            i4 = random.randrange(0, 9)
-        self.games[MastermindGame.sessions]["nums"] = (i1, i2, i3, i4)
+        g = {"guesses": [], "session_id": MastermindGame.sessions}
 
-        return {"session_id": self.games[MastermindGame.sessions]["session_id"]}
+        self.games[MastermindGame.sessions] = Game(g["guesses"], g["session_id"])
+        return {"session_id": self.games[MastermindGame.sessions].get_session_ID()}
 
     def read_game(self, request: dict) -> dict:
         """
@@ -61,7 +50,9 @@ class MastermindGame(GameInterface):
             {"guesses": [((0, 1, 2, 3), (1, 2), ((3, 2, 1, 0), (2, 1))], "session_id": 1, "done": False}
         """
 
-        return {"guesses": self.games[request["session_id"]]["guesses"], "session_id": self.games[request["session_id"]]["session_id"], "done": self.games[request["session_id"]]["done"]}
+        return {"guesses": self.games[request["session_id"]].guesses,
+                "session_id": self.games[request["session_id"]].session_id,
+                "done": self.games[request["session_id"]].done}
 
     def update_game(self, request: dict) -> dict:
         """
@@ -85,16 +76,16 @@ class MastermindGame(GameInterface):
         cows = 0
         bulls = 0
         for i in range(4):
-            if request["guess"][i] == self.games[request["session_id"]]["nums"][i]:
+            if request["guess"][i] == self.games[request["session_id"]].nums[i]:
                 bulls += 1
-            elif request["guess"][i] in self.games[request["session_id"]]["nums"]:
+            elif request["guess"][i] in self.games[request["session_id"]].nums:
                 cows += 1
 
-        self.games[request["session_id"]]["guesses"].append((request["guess"], (cows, bulls)))
+        self.games[request["session_id"]].guesses.append((request["guess"], (cows, bulls)))
         if bulls == 4:
-            self.games[request["session_id"]]["done"] = True
+            self.games[request["session_id"]].done = True
 
-        return {"guesses": self.games[request["session_id"]]["guesses"], "session_id": self.games[request["session_id"]]["session_id"], "done": self.games[request["session_id"]]["done"]}
+        return MastermindGame.read_game(self, request)
 
     def delete_game(self, request: dict) -> dict:
         """
@@ -107,3 +98,37 @@ class MastermindGame(GameInterface):
         """
         del self.games[request["session_id"]]
         return {"session_id": request["session_id"]}
+
+class Game():
+    guesses = []
+    session_id = 0
+    done = False
+    nums = ()
+
+    def __init__(self, guesses, session_id):
+        self.guesses = guesses
+        self.session_id = session_id
+        i1 = random.randrange(0, 9)
+        i2 = random.randrange(0, 9)
+        while i2 == i1:
+            i2 = random.randrange(0, 9)
+        i3 = random.randrange(0, 9)
+        while i3 == i1 or i3 == i2:
+            i3 = random.randrange(0, 9)
+        i4 = random.randrange(0, 9)
+        while i4 == i1 or i4 == i2 or i4 == i3:
+            i4 = random.randrange(0, 9)
+        self.nums = (i1, i2, i3, i4)
+
+    def get_session_ID(self) -> int:
+        return self.session_id
+
+    def get_nums(self):
+        return self.nums
+
+    def get_status(self) -> bool:
+        return self.done
+
+    def get_guesses(self):
+        return self.guesses
+

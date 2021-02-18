@@ -49,7 +49,7 @@ class MastermindTestCase(unittest.TestCase):
         game = MastermindGame()
         proxy = MastermindGameProxy(game)
         session_id = proxy.create_game({"game_id": 0})["session_id"]
-        sequence = game.games[session_id]["nums"]
+        sequence = game.games[session_id].nums
         proxy.update_game({"session_id": session_id, "guess": sequence})
         done = proxy.read_game({"session_id": session_id})["done"]
         self.assertTrue(done)
@@ -84,7 +84,7 @@ class MastermindTestCase(unittest.TestCase):
         game = MastermindGame()
         proxy = MastermindGameProxy(game)
         session_id = proxy.create_game({"game_id": 0, "extraneous input": "MONKEY"})["session_id"]
-        guess = game.games[session_id]["nums"]
+        guess = game.games[session_id].nums
         proxy.update_game({"session_id": session_id, "guess": guess, "more extra input": "DOG"})
         done = proxy.read_game({"session_id": session_id, "even more extra input": "DRAGON"})
         self.assertTrue(done)
