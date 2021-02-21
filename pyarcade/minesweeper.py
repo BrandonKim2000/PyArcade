@@ -16,62 +16,22 @@ class MinesweeperGame(GameInterface):
         self.games = {}
 
     def create_game(self, request: dict) -> dict:
-        """ Upon calling create_game, the Minesweeper game should initialize its hidden sequence
-
-         Args:
-             request: dictionary containing single key-value pair. The key is "game_id".
-
-         Returns:
-            reply: dictionary containing the session_id in the request.
-        """
         MinesweeperGame.sessions += 1
 
         self.games[MinesweeperGame.sessions] = Game(MinesweeperGame.sessions)
         return {"session_id": self.games[MinesweeperGame.sessions].get_session_id()}
 
     def read_game(self, request: dict) -> dict:
-        """
-        Args:
-            request: dictionary containing single key-value pair. The key is "session_id". The value is a
-            integer unique to all ongoing game sessions.
-
-        Returns:
-            reply: dictionary containing three keys.
-                "guesses": all previous guesses and their respective numbers of cows and bulls
-                for this game_session. All guesses should be kept as a list of tuples under the key "guesses."
-                A guess of (0, 1, 2, 3) that has one cow and two bulls should be APPENDED to the list as
-                ((0, 1, 2, 3), (1, 2)).
-                "session_id": session_id provided with the original request.
-                "done": True or False depending on whether the game is over.
-
-            So the overall reply could look like:
-            {"guesses": [((0, 1, 2, 3), (1, 2), ((3, 2, 1, 0), (2, 1))], "session_id": 1, "done": False}
-        """
         board = self.games[request["session_id"]].get_board()
         return {"board": board,
                 "session_id": self.games[request["session_id"]].session_id,
                 "status": self.games[request["session_id"]].status}
 
     def update_game(self, request: dict) -> dict:
-        """
-        Args:
-            request: dictionary containing two key-value pairs. One key is "session_id". The value is a
-            integer unique to all ongoing game sessions. The second key is "guess." The value should be a tuple
-            of four integers.
-
-        Returns:
-            reply: dictionary containing three keys.
-                "guesses": all previous guesses and their respective numbers of cows and bulls
-                for this game_session. All guesses should be kept as a list of tuples under the key "guesses."
-                A guess of (0, 1, 2, 3) that has one cow and two bulls should be APPENDED to the list as
-                ((0, 1, 2, 3), (1, 2)).
-                "session_id": session_id provided with the original request.
-                "done": True or False depending on whether the game is over.
-
-            So the overall reply could look like:
-            {"guesses": [((0, 1, 2, 3), (1, 2), ((3, 2, 1, 0), (2, 1))], "session_id": 1, "done": False}
-        """
-        self.games[request["session_id"]].guess(request["guess"][0], request["guess"][1])
+        if len(request["guess"]) >= 3 and request["guess"] in ("flag", "f"):
+                self.games[request["session_id"]].flag(request["guess"][0], request["guess"][1])
+        else:
+            self.games[request["session_id"]].guess(request["guess"][0], request["guess"][1])
 
         return MinesweeperGame.read_game(self, request)
 
@@ -90,6 +50,7 @@ class MinesweeperGame(GameInterface):
 
 class Game:
     guesses = []
+    flags = []
     session_id = 0
     status = False
     nums = ()
@@ -121,6 +82,8 @@ class Game:
             for c in range(len(self.board[0])):
                 if self.uncovered[r][c]:
                     ret_board[r][c] = self.board[r][c]
+                if (r, c) in self.flags:
+                    ret_board[r][c] = "F"
         return ret_board
 
     def get_status(self) -> bool:
@@ -134,9 +97,20 @@ class Game:
             return
         self.guesses.append((r, c))
         self.uncovered[r][c] = True
+        if (r, c) in self.flags:
+            self.flags.remove((r, c))
         if self.board[r][c] == -1:
             self.status = "LOSE"
         else:
             self.uncovered_spaces -= 1
             if self.uncovered_spaces == 0:
                 self.status = "WIN!"
+
+    def flag(self, r ,c):
+        if self.uncovered[r][c]:
+            return
+        if (r, c) in self.flags:
+            self.flags.remove((r, c))
+        else:
+            self.flags.append((r, c))
+
