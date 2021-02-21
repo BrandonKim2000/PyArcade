@@ -28,11 +28,12 @@ class MastermindTestCase(unittest.TestCase):
     def test_update_and_read_game(self):
         game = MastermindGame()
         proxy = MastermindGameProxy(game)
-        session_id = proxy.create_game({"game_id": 0})["session_id"]
-        proxy.update_game({"session_id": session_id, "guess": (1, 2, 3, 4)})
-        proxy.update_game({"session_id": session_id, "guess": (4, 3, 2, 1)})
-        guess1 = proxy.read_game({"session_id": session_id})["guesses"][0][0]
-        guess2 = proxy.read_game({"session_id": session_id})["guesses"][1][0]
+        session_id1 = proxy.create_game({"game_id": 0})["session_id"]
+        session_id2 = proxy.create_game({"game_id": 0})["session_id"]
+        proxy.update_game({"session_id": session_id1, "guess": (1, 2, 3, 4)})
+        proxy.update_game({"session_id": session_id2, "guess": (4, 3, 2, 1)})
+        guess1 = proxy.read_game({"session_id": session_id1})["guesses"][0][0]
+        guess2 = proxy.read_game({"session_id": session_id2})["guesses"][0][0]
         self.assertEqual(guess1, (1, 2, 3, 4))
         self.assertEqual(guess2, (4, 3, 2, 1))
 

@@ -18,7 +18,7 @@ class MinesweeperGame(GameInterface):
     def create_game(self, request: dict) -> dict:
         MinesweeperGame.sessions += 1
 
-        self.games[MinesweeperGame.sessions] = Game(MinesweeperGame.sessions)
+        self.games[MinesweeperGame.sessions] = Game(MinesweeperGame.sessions, [], set())
         return {"session_id": self.games[MinesweeperGame.sessions].get_session_id()}
 
     def read_game(self, request: dict) -> dict:
@@ -28,7 +28,7 @@ class MinesweeperGame(GameInterface):
                 "status": self.games[request["session_id"]].status}
 
     def update_game(self, request: dict) -> dict:
-        if len(request["guess"]) >= 3 and request["guess"] in ("flag", "f"):
+        if len(request["guess"]) >= 3 and request["guess"][2] in ("flag", "f"):
                 self.games[request["session_id"]].flag(request["guess"][0], request["guess"][1])
         else:
             self.games[request["session_id"]].guess(request["guess"][0], request["guess"][1])
@@ -48,7 +48,7 @@ class MinesweeperGame(GameInterface):
         return {"session_id": request["session_id"]}
 
 
-class Game:
+class Game():
     guesses = []
     flags = []
     session_id = 0
@@ -57,12 +57,17 @@ class Game:
     uncovered_spaces = 54
     uncovered = [[False for x in range(8)] for y in range(8)]
     board = [[0 for x in range(8)] for y in range(8)]
-    bombs = set()
+    bombs = []
 
-    def __init__(self, session_id):
+    def __init__(self, session_id, guesses, bombs):
         self.session_id = session_id
-        while len(self.bombs) < 8:
-            self.bombs.add((random.randrange(0, 8), random.randrange(0, 8)))
+        self.guesses = guesses
+        bomb_list = []
+        while len(bomb_list) < 8:
+            b = (random.randrange(0, 8), random.randrange(0, 8))
+            if b not in bomb_list:
+                bomb_list.append(b)
+        self.bombs = bomb_list
         for b in self.bombs:
             for i1 in (-1, 0, 1):
                 for i2 in (-1, 0, 1):
@@ -106,7 +111,7 @@ class Game:
             if self.uncovered_spaces == 0:
                 self.status = "WIN!"
 
-    def flag(self, r ,c):
+    def flag(self, r, c):
         if self.uncovered[r][c]:
             return
         if (r, c) in self.flags:
