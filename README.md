@@ -1,35 +1,90 @@
-# PyArcade -- The Back End Test Suite
+**Smell 1: Data Clumps**
 
-# Software Requirements
-All of the software requirements are written in detail in comments directly under the function signatures for two files
-```proxy.py``` and ```mastermind.py```. You may, and probably will need to, create more functions for both of the 
-classes defined in these files.
+The dictionary games contains many dictionaries that should all be made into their own object.
+Lines 29 and 30 of mastermind.py
 
-# Testing Requirements
-Testing is a huge part of this assignment. The code implementations defined in the comments should not be 
-terribly difficult. You must create a test suite that *efficiently* and *exhaustively* tests sensible inputs and 
-outputs for the provided specifications. The concept of equivalence partitions is important here. When creating unit 
-tests, you should not be creating an abundance of tests for which the input exercises the function in a similar way. 
-Rather, you should choose tests that represent unique requirements for a function.
+Before:
+```
+    self.games[MastermindGame.sessions] = {"guesses": [], "session_id": 0, "done": False}
+    self.games[MastermindGame.sessions]["session_id"] = MastermindGame.sessions
+```
+Method: replace array with object
 
-The rubric states:
+Instead of storing each game as a dictionary I made a Game class:
+```
+class Game():
+    guesses = []
+    session_id = 0
+    done = False
+    nums = ()
 
-1. Has higher than 90% code coverage using [pytest-cov](https://pypi.org/project/pytest-cov/)
-2. Has test names which meaningfully describe the test.
-3. Has tests which are atomic (definition of a unit test). 
-4. Has tests which test *features* (integration tests) as well as simple functionality (unit tests). 
-
-What you SHOULD consider testing:
-1. Correctly typed inputs that have extra data. (behavior should be unaffected)
-2. Correctly typed but erroneous inputs.
-3. An entire sequence of inputs that results in winning the game in several ways. This is an integration test.
-
-What is NOT required to be tested:
-1. Input *types* being correct. We will consider type-hints as sufficient.
-
-## Rubric
-As always, mind the rubric. **You are not being graded solely on whether it works.** You must incorporate
-good practices to keep code complexity to a minimum and also use git correctly.
+    def __init__(self, guesses, session_id):
+        self.guesses = guesses
+        self.session_id = session_id
+```
 
 
- 
+
+**Smell 2: Duplicate Code**
+
+The code that checks for basic pieces of the input dictionary was repeated multiple times throughout proxy.py. Made it
+into one function that could be called by each proxy function.
+
+Method: Extract Method
+
+Before: this appeared 4 times throughout the code
+
+```
+        if isinstance(request, dict):
+            if "session_id" in request.keys():
+                if isinstance(request["session_id"], int):
+                    if request["session_id"] in self.game_instance.games.keys():
+                        #perform action here
+```
+
+Made the extract method to perform this function and return a boolean.
+
+```
+    def valid_game(self, request: dict) -> bool:
+        if isinstance(request, dict):
+            if "session_id" in request.keys():
+                if isinstance(request["session_id"], int):
+                    if request["session_id"] in self.game_instance.games.keys():
+                        return True
+        return False
+```
+
+**Smell 3: Duplicate Code**
+
+Realized that the returns of update_game() and read_game() were the same, so to save space I made update_game() call
+and return read_game()
+
+Can be seen in the new last line of update_game():
+```
+return MastermindGame.read_game(self, request)
+```
+
+**Smell 4: Divergent Change**
+
+The setting of the random numbers for each game was being done in the create_game() function, so I moved it into the
+game class so it would be easier to get more random numbers if needed.
+
+Method: Extract Class
+
+Randomization and setting of hidden code in the game class here:
+```
+    def __init__(self, guesses, session_id):
+        self.guesses = guesses
+        self.session_id = session_id
+        i1 = random.randrange(0, 9)
+        i2 = random.randrange(0, 9)
+        while i2 == i1:
+            i2 = random.randrange(0, 9)
+        i3 = random.randrange(0, 9)
+        while i3 == i1 or i3 == i2:
+            i3 = random.randrange(0, 9)
+        i4 = random.randrange(0, 9)
+        while i4 == i1 or i4 == i2 or i4 == i3:
+            i4 = random.randrange(0, 9)
+        self.nums = (i1, i2, i3, i4)
+```

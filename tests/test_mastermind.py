@@ -43,7 +43,7 @@ class MastermindTestCase(unittest.TestCase):
     def test_play_win_game(self):
         game = MastermindGame()
         session_id = game.create_game({"game_id": 0})["session_id"]
-        sequence = game.games[session_id]["nums"]
+        sequence = game.games[session_id].nums
         game.update_game({"session_id": session_id, "guess": sequence})
         done = game.read_game({"session_id": session_id})["done"]
         self.assertTrue(done)
