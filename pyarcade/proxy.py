@@ -87,14 +87,6 @@ class MastermindGameProxy(GameInterface):
         return False
 
 class MinesweeperGameProxy(GameInterface):
-    """ MastermindGameProxy is meant to be a mediator between client code attempting to play the game
-    Mastermind and the Mastermind implementation. More specifically, this class's responsibility
-    is to validate requests before passing them on to a Mastermind instance. Separating the responsibility of
-    validating inputs to a game and actually running a game helps us follow the single-responsibility principle
-
-    Args:
-        game_instance: A reference to the game being played.
-    """
 
     def __init__(self, game_instance: MinesweeperGame):
         self.game_instance = game_instance
