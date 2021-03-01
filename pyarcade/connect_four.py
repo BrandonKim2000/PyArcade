@@ -200,4 +200,3 @@ class ConnectFourGame(GameInterface):
        """
         self.games.pop(request["session_id"])
         return request
-    
