@@ -11,7 +11,7 @@ connectFourGame = ConnectFourGame()
 cfProxy = ConnectFourGameProxy(connectFourGame)
 
 
-def mastermindMenu():
+def mastermind_menu():
     print("Welcome to the Mastermind Menu")
 
     while True:
@@ -22,7 +22,7 @@ def mastermindMenu():
             session = mmProxy.create_game(d)
             session_id = session["session_id"]
             print(f"You have created a new game of Mastermind. The session_id is {session_id}")
-            playMastermind(session_id)
+            play_mastermind(session_id)
         elif gs == "2":
             print("The active sessions of Mastermind are:")
             games = mastermindGame.games.keys()
@@ -31,7 +31,7 @@ def mastermindMenu():
             # Need to adjust for non-integer input.
             if int(session_id) in mastermindGame.games:
                 print(f"Resuming game with session_id {session_id}")
-                playMastermind(int(session_id))
+                play_mastermind(int(session_id))
             else:
                 print("Could not find a game with that session_id")
         elif gs == "3":
@@ -45,7 +45,7 @@ def mastermindMenu():
     print("Returning to the arcade main menu")
 
 
-def playMastermind(session_id: int):
+def play_mastermind(session_id: int):
     game_in_session = True
 
     while game_in_session:
@@ -68,7 +68,7 @@ def playMastermind(session_id: int):
     print("Returning to the Mastermind menu")
 
 
-def minesweeperMenu():
+def minesweeper_menu():
     print("Welcome to the Minesweeper Menu")
 
     while True:
@@ -79,7 +79,7 @@ def minesweeperMenu():
             session = msProxy.create_game(d)
             session_id = session["session_id"]
             print(f"You have created a new game of Minesweeper. The session_id is {session_id}")
-            playMinesweeper(session_id)
+            play_minesweeper(session_id)
         elif gs == "2":
             print("The active sessions of Minesweeper are:")
             games = minesweeperGame.games.keys()
@@ -88,7 +88,7 @@ def minesweeperMenu():
             # Need to adjust for non-integer input.
             if int(session_id) in minesweeperGame.games:
                 print(f"Resuming game with session_id {session_id}")
-                playMinesweeper(int(session_id))
+                play_minesweeper(int(session_id))
             else:
                 print("Could not find a game with that session_id")
         elif gs == "3":
@@ -102,7 +102,7 @@ def minesweeperMenu():
     print("Returning to the arcade menu")
 
 
-def playMinesweeper(session_id: int):
+def play_minesweeper(session_id: int):
     print(f"You are playing Minesweeper session #{session_id}. To return to Minesweeper game menu enter \"quit\".")
 
     game_in_session = True
@@ -134,7 +134,7 @@ def playMinesweeper(session_id: int):
     print("Returning to Minesweeper menu.")
 
 
-def connectFourMenu():
+def connect_four_menu():
     print("Welcome to the Connect Four Menu")
 
     while True:
@@ -145,20 +145,20 @@ def connectFourMenu():
             session = cfProxy.create_game(d)
             session_id = session["session_id"]
             print(f"You have created a new game of Connect Four. The session_id is {session_id}")
-            playConnectFour(session_id)
+            play_connect_four(session_id)
         elif gs == "2":
             print("The active sessions of Connect Four are:")
             games = connectFourGame.games.keys()
             if len(games) == 0:
                 print("There are no active sessions!\n")
                 print("Returning to the Connect Four game menu\n")
-                connectFourMenu()
+                connect_four_menu()
             print(games)
             session_id = input("Enter the session of Connect Four that you would like to resume")
             # Accounting for non-integer input.
             if int(session_id) in connectFourGame.games:
                 print(f"Resuming game with session_id {session_id}")
-                playConnectFour(int(session_id))
+                play_connect_four(int(session_id))
             else:
                 print("Could not find a game with that session_id")
         elif gs == "3":
@@ -167,14 +167,14 @@ def connectFourMenu():
                   "a line in a horizontal, vertical, or diagonal direction. In this game of Connect Four, it will \n"
                   "be a two-player game in which each user takes turns making their moves until the game is finished.\n")
             print("Returning to the Connect Four game menu\n")
-            connectFourMenu()
+            connect_four_menu()
         elif gs == "4":
             break
         else:
             print("I'm sorry, I didn't catch that.")
 
 
-def playConnectFour(session_id: int):
+def play_connect_four(session_id: int):
     game_in_session = True
 
     while game_in_session:
@@ -197,21 +197,24 @@ def playConnectFour(session_id: int):
             cfProxy.delete_game({"session_id": session_id})
 
     print("Returning to the Connect Four Menu\n")
-    connectFourMenu()
+    connect_four_menu()
 
-
-if __name__ == "__main__":
+def main_menu():
     print("Welcome to Benny and Brando's arcade!")
     print("This arcade currently contains 3 games. You can switch between the games and create multiple sessions of"
           "each one.")
     while True:
         gs = input("Enter 0 to play Mastermind, 1 to play Minesweeper, or 2 to play Connect Four\n")
         if gs == "0":
-            mastermindMenu()
+            mastermind_menu()
         elif gs == "1":
-            minesweeperMenu()
+            minesweeper_menu()
         elif gs == "2":
-            connectFourMenu()
-            pass
+            connect_four_menu()
         else:
             print("I'm sorry, I didn't catch that.")
+
+
+if __name__ == "__main__":
+    main_menu()
+
