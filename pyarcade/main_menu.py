@@ -11,13 +11,14 @@ connectFourGame = ConnectFourGame()
 cfProxy = ConnectFourGameProxy(connectFourGame)
 
 
-def mastermind_menu():
+def mastermind_menu(request: dict):
     print("Welcome to the Mastermind Menu")
 
     while True:
-        gs = input("Press 1 to start a new game of Mastermind. Press 2 to load an existing game of Mastermind.\n"
-                   "Press 3 to see the Mastermind rules. Press 4 to return to the arcade main menu.\n")
-        if gs == "1":
+        #gs = input("Press 1 to start a new game of Mastermind. Press 2 to load an existing game of Mastermind.\n"
+                   #"Press 3 to see the Mastermind rules. Press 4 to return to the arcade main menu.\n")
+        gs = request["gs"]
+        if gs == request[dict]:
             d = {"game_id": 0}
             session = mmProxy.create_game(d)
             session_id = session["session_id"]
@@ -68,12 +69,13 @@ def play_mastermind(session_id: int):
     print("Returning to the Mastermind menu")
 
 
-def minesweeper_menu():
+def minesweeper_menu(request: dict):
     print("Welcome to the Minesweeper Menu")
 
     while True:
-        gs = input("Press 1 to start a new game of Minesweeper. Press 2 to load an existing game of Minesweeper.\n"
-                   "Press 3 to see the Minesweeper rules. Press 4 to return to the arcade menu.\n")
+        #gs = input("Press 1 to start a new game of Minesweeper. Press 2 to load an existing game of Minesweeper.\n"
+                   #"Press 3 to see the Minesweeper rules. Press 4 to return to the arcade menu.\n")
+        gs = request["gs"]
         if gs == "1":
             d = {"game_id": 1}
             session = msProxy.create_game(d)
@@ -134,13 +136,13 @@ def play_minesweeper(session_id: int):
     print("Returning to Minesweeper menu.")
 
 
-def connect_four_menu():
+def connect_four_menu(request: dict):
     print("Welcome to the Connect Four Menu")
-
     while True:
-        gs = input("Press 1 to start a new game of Connect Four. Press 2 to load an existing game of Connect Four. \n"
-                   "Press 3 to see the Connect Four rules. Press 4 to return to the arcade main menu.\n")
-        if gs == "1":
+        #gs = input("Press 1 to start a new game of Connect Four. Press 2 to load an existing game of Connect Four. \n"
+                   #"Press 3 to see the Connect Four rules. Press 4 to return to the arcade main menu.\n")
+        gs = request["gs"]
+        if gs == "`1":
             d = {"game_id": 2}
             session = cfProxy.create_game(d)
             session_id = session["session_id"]
@@ -199,12 +201,12 @@ def play_connect_four(session_id: int):
     print("Returning to the Connect Four Menu\n")
     connect_four_menu()
 
-def main_menu():
+def main_menu(request: dict):
     print("Welcome to Benny and Brando's arcade!")
     print("This arcade currently contains 3 games. You can switch between the games and create multiple sessions of"
           "each one.")
     while True:
-        gs = input("Enter 0 to play Mastermind, 1 to play Minesweeper, or 2 to play Connect Four\n")
+        gs = request["gs"]
         if gs == "0":
             mastermind_menu()
         elif gs == "1":
