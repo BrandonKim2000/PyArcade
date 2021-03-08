@@ -1,4 +1,5 @@
 from flask import Flask, request
+from main_menu import *
 from pyarcade.connect_four import ConnectFourGame
 from pyarcade.minesweeper import MinesweeperGame
 from pyarcade.mastermind import MastermindGame
@@ -13,6 +14,7 @@ def create_app():
     msProxy = MinesweeperGameProxy(minesweeperGame)
     connectFourGame = ConnectFourGame()
     cfProxy = ConnectFourGameProxy(connectFourGame)
+
 
     # Mastermind
     @flask_app.route("/mastermind", methods=["GET"])
@@ -65,5 +67,21 @@ def create_app():
     def delete_connectfour():
         return cfProxy.delete_game(request.get_json())
 
+    # Menu Functions
+    @flask_app.route("/main_menu", methods=["GET"])
+    def main_menu():
+        return main_menu(request.get_json())
+
+    @flask_app.route("/mastermind_menu", methods=["GET"])
+    def mastermind_menu():
+        return mastermind_menu(request.get_json())
+
+    @flask_app.route("/minesweeper_menu", methods=["GET"])
+    def minesweeper_menu():
+        return minesweeper_menu(request.get_json())
+
+    @flask_app.route("/connect_four_menu", methods=["GET"])
+    def connect_four_menu():
+        return connect_four_menu(request.get_json())
 
     return flask_app
