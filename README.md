@@ -1,90 +1,130 @@
-**Smell 1: Data Clumps**
+## Assignment 5 Approximate Work Distribution
+### 1. Benny Beinish: 50%
+#### 1.  Finished mastermind, minesweeper, main_menu implementation
+#### 2. Added flask implementation
+#### 3. Added tests for main menu and minesweper menu
 
-The dictionary games contains many dictionaries that should all be made into their own object.
-Lines 29 and 30 of mastermind.py
+### 2. Brandon Kim: 50%
+#### 1. Implemented connect_four game to merge
+#### 2. Added tests for connect_four, proxy, connect four menu, and mastermind menu
+#### 3. Applied use of singleton pattern
 
-Before:
+# Implementing a Design Pattern
+
+##1. Design Pattern we chose: Singleton
+
+##2. How and Why we Chose it
+### The Singleton design pattern ensures that only one instance of an object exists globally. It's purpose is to control access to shared and/or sensitive resources, in our case being the games and specific sessions.
+### We chose this design pattern because we wanted to make sure that only one specific game and one session associated with that game can be played at a single time. Without the limitation to a single instance, the data could become messy and create a confusing platform for the user when experiencing our program.
+### We implemented Singleton in each of our specific games (mastermind, minesweeper, connect four), as well as our main menu. This allowed our code to become much more maintainable, as we could easily find bugs or errors in our code when testing due to the fact that only one game or one menu option could be inputted or played at one time.
+
+##3. Where it's implemented
+### These classes are examples of Singleton:
+### pyarcade/mastermind.py
+
+### pyacade/minesweeper.py
+
+### pyarcade/connect_four.py
+
+### pyarcade/main_menu.py
+
+### The only time these classes are instantiated in all the gameplay is in lines 6-11 of the main menu:
+
 ```
-    self.games[MastermindGame.sessions] = {"guesses": [], "session_id": 0, "done": False}
-    self.games[MastermindGame.sessions]["session_id"] = MastermindGame.sessions
+mastermindGame = MastermindGame()
+mmProxy = MastermindGameProxy(mastermindGame)
+minesweeperGame = MinesweeperGame()
+msProxy = MinesweeperGameProxy(minesweeperGame)
+connectFourGame = ConnectFourGame()
+cfProxy = ConnectFourGameProxy(connectFourGame)
 ```
-Method: replace array with object
 
-Instead of storing each game as a dictionary I made a Game class:
+### By having the inner class 'game', the classes 'MastermindGame', 'connectFourGame', and 'MinesweeperGame' are able to have multiple sessions, while only being instantiated once.
+
+### mastermind.py: lines 102-133
+### minesweeper.py: lines 51-120
+### connect_four.py: lines 
+
+## 4. Code Snippets:
+### THe following code snippet is the create_game function. This allows us to only create one minesweeper game at a time.
+```
+   def create_game(self, request: dict) -> dict:
+        MinesweeperGame.sessions += 1
+
+        self.games[MinesweeperGame.sessions] = Game(MinesweeperGame.sessions, [], set())
+        return {"session_id": self.games[MinesweeperGame.sessions].get_session_id()}
+```
+
+### The following code snippet is the minesweeper game class:
 ```
 class Game():
     guesses = []
+    flags = []
     session_id = 0
-    done = False
+    status = False
     nums = ()
+    uncovered_spaces = 54
+    uncovered = [[False for x in range(8)] for y in range(8)]
+    board = [[0 for x in range(8)] for y in range(8)]
+    bombs = []
 
-    def __init__(self, guesses, session_id):
-        self.guesses = guesses
+    def __init__(self, session_id, guesses, bombs):
         self.session_id = session_id
-```
-
-
-
-**Smell 2: Duplicate Code**
-
-The code that checks for basic pieces of the input dictionary was repeated multiple times throughout proxy.py. Made it
-into one function that could be called by each proxy function.
-
-Method: Extract Method
-
-Before: this appeared 4 times throughout the code
-
-```
-        if isinstance(request, dict):
-            if "session_id" in request.keys():
-                if isinstance(request["session_id"], int):
-                    if request["session_id"] in self.game_instance.games.keys():
-                        #perform action here
-```
-
-Made the extract method to perform this function and return a boolean.
-
-```
-    def valid_game(self, request: dict) -> bool:
-        if isinstance(request, dict):
-            if "session_id" in request.keys():
-                if isinstance(request["session_id"], int):
-                    if request["session_id"] in self.game_instance.games.keys():
-                        return True
-        return False
-```
-
-**Smell 3: Duplicate Code**
-
-Realized that the returns of update_game() and read_game() were the same, so to save space I made update_game() call
-and return read_game()
-
-Can be seen in the new last line of update_game():
-```
-return MastermindGame.read_game(self, request)
-```
-
-**Smell 4: Divergent Change**
-
-The setting of the random numbers for each game was being done in the create_game() function, so I moved it into the
-game class so it would be easier to get more random numbers if needed.
-
-Method: Extract Class
-
-Randomization and setting of hidden code in the game class here:
-```
-    def __init__(self, guesses, session_id):
         self.guesses = guesses
-        self.session_id = session_id
-        i1 = random.randrange(0, 9)
-        i2 = random.randrange(0, 9)
-        while i2 == i1:
-            i2 = random.randrange(0, 9)
-        i3 = random.randrange(0, 9)
-        while i3 == i1 or i3 == i2:
-            i3 = random.randrange(0, 9)
-        i4 = random.randrange(0, 9)
-        while i4 == i1 or i4 == i2 or i4 == i3:
-            i4 = random.randrange(0, 9)
-        self.nums = (i1, i2, i3, i4)
+        bomb_list = []
+        while len(bomb_list) < 8:
+            b = (random.randrange(0, 8), random.randrange(0, 8))
+            if b not in bomb_list:
+                bomb_list.append(b)
+        self.bombs = bomb_list
+        for b in self.bombs:
+            for i1 in (-1, 0, 1):
+                for i2 in (-1, 0, 1):
+                    try:
+                        self.board[b[0] + i1][b[1] + i2] += 1
+                    except IndexError:
+                        pass
+        for b in self.bombs:
+            self.board[b[0]][b[1]] = -1
+
+    def get_session_id(self) -> int:
+        return self.session_id
+
+    def get_board(self):
+        ret_board = [["B" for x in range(8)] for y in range(8)]
+        for r in range(len(self.board)):
+            for c in range(len(self.board[0])):
+                if self.uncovered[r][c]:
+                    ret_board[r][c] = self.board[r][c]
+                if (r, c) in self.flags:
+                    ret_board[r][c] = "F"
+        return ret_board
+
+    def get_status(self) -> bool:
+        return self.status
+
+    def get_guesses(self):
+        return self.guesses
+
+    def guess(self, r, c):
+        if self.uncovered[r][c]:
+            return
+        self.guesses.append((r, c))
+        self.uncovered[r][c] = True
+        if (r, c) in self.flags:
+            self.flags.remove((r, c))
+        if self.board[r][c] == -1:
+            self.status = "LOSE"
+        else:
+            self.uncovered_spaces -= 1
+            if self.uncovered_spaces == 0:
+                self.status = "WIN!"
+
+    def flag(self, r, c):
+        if self.uncovered[r][c]:
+            return
+        if (r, c) in self.flags:
+            self.flags.remove((r, c))
+        else:
+            self.flags.append((r, c))
 ```
