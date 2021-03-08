@@ -174,7 +174,6 @@ def connect_four_menu(request: dict):
                   "a line in a horizontal, vertical, or diagonal direction. In this game of Connect Four, it will \n"
                   "be a two-player game in which each user takes turns making their moves until the game is finished.\n")
             print("Returning to the Connect Four game menu\n")
-            connect_four_menu()
         elif gs == "4":
             break
         else:
