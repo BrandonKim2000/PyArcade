@@ -22,7 +22,7 @@ def mastermind_menu(request: dict):
             d = {"game_id": 0}
             session = mmProxy.create_game(d)
             session_id = session["session_id"]
-            print(f"You have created a new game of Mastermind. The session_id is {session_id}")
+            print("You have created a new game of Mastermind. The session_id is {session_id}")
             play_mastermind(session_id)
         elif gs == "2":
             print("The active sessions of Mastermind are:")
@@ -31,13 +31,16 @@ def mastermind_menu(request: dict):
             session_id = input("Enter the session of Mastermind that you would like to resume")
             # Need to adjust for non-integer input.
             if int(session_id) in mastermindGame.games:
-                print(f"Resuming game with session_id {session_id}")
+                print("Resuming game with session_id {session_id}")
                 play_mastermind(int(session_id))
             else:
                 print("Could not find a game with that session_id")
         elif gs == "3":
-            # List the rules/instructions
-            pass
+            print("Mastermind is quite simple. The computer will give think of four numbers and you have to guess what "
+                  "they are. Every time you make a guess you will see your previous guesses and a number that "
+                  "indicates how many of those guesses were in the pattern, yet you put them in the wrong spot (cows), "
+                  "and how many numbers of your guess were in the correct spot (bulls). Use this feedback to adjust "
+                  "your guess until you guess the number in all four spots.")
         elif gs == "4":
             break
         else:
@@ -80,7 +83,7 @@ def minesweeper_menu(request: dict):
             d = {"game_id": 1}
             session = msProxy.create_game(d)
             session_id = session["session_id"]
-            print(f"You have created a new game of Minesweeper. The session_id is {session_id}")
+            print("You have created a new game of Minesweeper. The session_id is {session_id}")
             play_minesweeper(session_id)
         elif gs == "2":
             print("The active sessions of Minesweeper are:")
@@ -89,13 +92,15 @@ def minesweeper_menu(request: dict):
             session_id = input("Enter the session of Minesweeper that you would like to resume")
             # Need to adjust for non-integer input.
             if int(session_id) in minesweeperGame.games:
-                print(f"Resuming game with session_id {session_id}")
+                print("Resuming game with session_id {session_id}")
                 play_minesweeper(int(session_id))
             else:
                 print("Could not find a game with that session_id")
         elif gs == "3":
-            # List the rules/instructions
-            pass
+            print("Minesweeper is quite simple. There are 64 mystery boxes that contain either a bomb or a number. "
+                  "Your job is to open each box that doesn't contain a bomb, without clicking on any bombs. "
+                  "When you click a square it reveals the number behind that square. That number is how many adjacent "
+                  "boxes contain a bomb. Use these as clues to avoid the bombs and click thorugh all the free spots!")
         elif gs == "4":
             break
         else:
@@ -105,7 +110,7 @@ def minesweeper_menu(request: dict):
 
 
 def play_minesweeper(session_id: int):
-    print(f"You are playing Minesweeper session #{session_id}. To return to Minesweeper game menu enter \"quit\".")
+    print("You are playing Minesweeper session #{session_id}. To return to Minesweeper game menu enter \"quit\".")
 
     game_in_session = True
     while game_in_session:
@@ -146,7 +151,7 @@ def connect_four_menu(request: dict):
             d = {"game_id": 2}
             session = cfProxy.create_game(d)
             session_id = session["session_id"]
-            print(f"You have created a new game of Connect Four. The session_id is {session_id}")
+            print("You have created a new game of Connect Four. The session_id is {session_id}")
             play_connect_four(session_id)
         elif gs == "2":
             print("The active sessions of Connect Four are:")
@@ -159,7 +164,7 @@ def connect_four_menu(request: dict):
             session_id = input("Enter the session of Connect Four that you would like to resume")
             # Accounting for non-integer input.
             if int(session_id) in connectFourGame.games:
-                print(f"Resuming game with session_id {session_id}")
+                print("Resuming game with session_id {session_id}")
                 play_connect_four(int(session_id))
             else:
                 print("Could not find a game with that session_id")
