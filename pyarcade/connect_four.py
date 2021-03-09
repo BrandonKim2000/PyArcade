@@ -8,9 +8,10 @@ class ConnectFourGame(GameInterface):
        choose a column to insert the piece into
    """
 
+    sessions = 0
+
     def __init__(self):
         self.games = {}
-        self.session_id_next = 1
         self.width = 7
         self.height = 6
 
@@ -24,20 +25,11 @@ class ConnectFourGame(GameInterface):
            reply: dictionary containing the session_id in the request
        """
 
-        # '_' is used because the local variable is not used anywhere else, represent
-        # each space in the multidimensional array
-        board = []
-        for row in range(self.height):
-            board_row = []
-            for column in range(self.width):
-                board_row.append(' ')
-            board.append(board_row)
+        ConnectFourGame.sessions += 1
 
-        session_id_current = self.session_id_next
-        self.session_id_next += 1
-        self.games[session_id_current] = {"board": board, "player_to_play": 1, "done": False}
+        self.games[ConnectFourGame.sessions] = Game([], 1, ConnectFourGame.sessions)
 
-        return {"session_id": session_id_current}
+        return {"session_id": self.games[ConnectFourGame.sessions].get_session_ID()}
 
     def read_game(self, request: dict) -> dict:
         """
@@ -52,9 +44,10 @@ class ConnectFourGame(GameInterface):
            "done": True or False depending on whether the game is over.
            "session_id": session_id provided with the original request.
        """
-        current_game = dict(self.games[request["session_id"]])  # dict() created a copy of self.games
-        current_game["session_id"] = request["session_id"]
-        return current_game
+        return {"board": self.games[request["session_id"]].board,
+                "player_to_play": self.games[request["session_id"]].player_to_play,
+                "done": self.games[request["session_id"]].done,
+                "session_id": self.games[request["session_id"]].session_id}
 
     def get_column(self, request, index):
         """
@@ -63,8 +56,8 @@ class ConnectFourGame(GameInterface):
        :param request: Holding the session_id to check the correct board
        :param index: Index at which column will be returned
        """
-        current_game = dict(self.games[request["session_id"]])
-        current_board = current_game["board"]
+        current_game = self.games[request["session_id"]]
+        current_board = current_game.board
 
         return [col[index] for col in current_board]
 
@@ -75,8 +68,8 @@ class ConnectFourGame(GameInterface):
        :param request: Holding the session_id to check the correct board
        :param index: Index at which column will be returned
        """
-        current_game = dict(self.games[request["session_id"]])
-        current_board = current_game["board"]
+        current_game = self.games[request["session_id"]]
+        current_board = current_game.board
 
         return current_board[index]
 
@@ -84,8 +77,8 @@ class ConnectFourGame(GameInterface):
         """
        Returns all the diagonals in the game
        """
-        current_game = dict(self.games[request["session_id"]])
-        current_board = current_game["board"]
+        current_game = self.games[request["session_id"]]
+        current_board = current_game.board
         diagonals = []
 
         for idx in range(self.height + self.width - 1):
@@ -130,8 +123,8 @@ class ConnectFourGame(GameInterface):
         """
        Checks to see if the board is full, if so the game is done
        """
-        current_game = dict(self.games[request["session_id"]])
-        current_board = current_game["board"]
+        current_game = self.games[request["session_id"]]
+        current_board = current_game.board
 
         for row in current_board:
             for elem in row:
@@ -144,7 +137,7 @@ class ConnectFourGame(GameInterface):
         Simplifying the update_game function, call to drop the piece in the correct column.
         """
         current_game = self.games[request["session_id"]]
-        current_board = current_game["board"]
+        current_board = current_game.board
 
         column = request["column"]
         session_id = {"session_id": request["session_id"]}
@@ -155,12 +148,12 @@ class ConnectFourGame(GameInterface):
         while current_board[height][column] != ' ':
             height -= 1
 
-        if current_game["player_to_play"] == 1:
+        if current_game.player_to_play == 1:
             current_board[height][column] = 'X'
-            current_game["player_to_play"] = 2
-        elif current_game["player_to_play"] == 2:
+            current_game.player_to_play = 2
+        elif current_game.player_to_play == 2:
             current_board[height][column] = 'O'
-            current_game["player_to_play"] = 1
+            current_game.player_to_play = 1
 
         return current_game
 
@@ -180,14 +173,12 @@ class ConnectFourGame(GameInterface):
        """
         current_game = self.games[request["session_id"]]
 
-        move = self.make_move(request)
+        self.make_move(request)
 
         if self.check_win(request) is True or self.check_full_board(request) is True:
-            current_game["done"] = True
+            current_game.done = True
 
-        copy_game = dict(move)
-        copy_game["session_id"] = request["session_id"]
-        return copy_game
+        return ConnectFourGame.read_game(self, request)
 
     def delete_game(self, request: dict) -> dict:
         """
@@ -200,3 +191,34 @@ class ConnectFourGame(GameInterface):
        """
         self.games.pop(request["session_id"])
         return request
+
+
+class Game():
+    board = []
+    session_id = 0
+    player_to_play = 1
+    done = False
+
+    def __init__(self, board, player_to_play, session_id):
+        height = 6
+        width = 7
+        self.session_id = session_id
+        self.player_to_play = player_to_play
+
+        for row in range(height):
+            board_row = []
+            for column in range(width):
+                board_row.append(' ')
+            board.append(board_row)
+
+        self.board = board
+
+    def get_session_ID(self):
+        return self.session_id
+
+    def get_board(self):
+        for row in self.board:
+            print('|' + '|'.join(row) + '|')
+
+    def get_status(self):
+        return self.done
