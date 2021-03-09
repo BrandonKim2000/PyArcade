@@ -189,11 +189,11 @@ class ConnectFourGame(GameInterface):
        Returns:
            reply: dictionary containing the session_id in the request
        """
-        self.games.pop(request["session_id"])
-        return request
+        del self.games[request["session_id"]]
+        return {"session_id": request["session_id"]}
 
 
-class Game():
+class Game:
     board = []
     session_id = 0
     player_to_play = 1
