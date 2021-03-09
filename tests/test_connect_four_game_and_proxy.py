@@ -168,9 +168,9 @@ class ConnectFourTestCase(unittest.TestCase):
         proxy.create_game({"game_id": 2})
 
         reply = proxy.update_game({"session_id": 1, "column": 1})
-        reply.pop("board")
-        reply.pop("done")
-        reply.pop("player_to_play")
+        del reply.board
+        del reply.done
+        del reply.player_to_play
         self.assertEqual(reply, {"session_id": 1})
 
     def test_proxy_update_game_integration_test_pass_row(self):
