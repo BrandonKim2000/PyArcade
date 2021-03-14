@@ -4,4 +4,4 @@ import unittest
 
 
 class MenuTestCase(unittest.TestCase):
-    
+    pass
