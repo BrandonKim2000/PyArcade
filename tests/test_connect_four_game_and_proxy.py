@@ -168,9 +168,15 @@ class ConnectFourTestCase(unittest.TestCase):
         proxy.create_game({"game_id": 2})
 
         reply = proxy.update_game({"session_id": 1, "column": 1})
+<<<<<<< HEAD
         del reply.board
         del reply.done
         del reply.player_to_play
+=======
+        del reply["board"]
+        del reply["done"]
+        del reply["player_to_play"]
+>>>>>>> bkim_connect_four_and_menu_tests
         self.assertEqual(reply, {"session_id": 1})
 
     def test_proxy_update_game_integration_test_pass_row(self):
@@ -353,17 +359,19 @@ class ConnectFourTestCase(unittest.TestCase):
     # delete_game function tests
     def test_delete_game_base(self):
         game = ConnectFourGame()
-        game.create_game({"game_id": 2})
-        request = {"session_id": 1}
-        game.delete_game(request)
-
-        self.assertEqual(len(game.games), 0)
+        proxy = ConnectFourGameProxy(game_instance=game)
+        session_id = proxy.create_game({"game_id": 1})["session_id"]
+        proxy.update_game({"session_id": session_id, "column": 0})
+        self.assertTrue(session_id in game.games.keys())
+        proxy.delete_game({"session_id": session_id})
+        self.assertTrue(session_id not in game.games.keys())
 
     def test_delete_game_multiple_ids(self):
         game = ConnectFourGame()
-        game.create_game({"game_id": 2})
-        game.create_game({"game_id": 2})
+        proxy = ConnectFourGameProxy(game)
+        proxy.create_game({"game_id": 2})
+        proxy.create_game({"game_id": 2})
         request = {"session_id": 1}
-        game.delete_game(request)
+        proxy.delete_game(request)
 
         self.assertEqual(len(game.games), 1)

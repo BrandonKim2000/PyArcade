@@ -167,7 +167,6 @@ def connect_four_menu(request: dict = {}):
             games = connectFourGame.games.keys()
             if len(games) == 0:
                 print("There are no active sessions!\n")
-                print("Returning to the Connect Four game menu\n")
             print(games)
             session_id = input("Enter the session of Connect Four that you would like to resume")
             # Accounting for non-integer input.
@@ -175,7 +174,7 @@ def connect_four_menu(request: dict = {}):
                 print(f"Resuming game with session_id {session_id}")
                 play_connect_four(int(session_id))
             else:
-                print("Could not find a game with that session_id")
+                print("Could not find a game with that session_id\n")
         elif gs == "3":
             # List the rules/instructions
             print("In Connect Four, the goal is to create a line of four of your color. This can be done by creating \n"

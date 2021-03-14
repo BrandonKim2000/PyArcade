@@ -171,12 +171,11 @@ class ConnectFourGame(GameInterface):
                "done": True or False depending on whether the game is over
                "session_id": session_id provided with the original request
        """
-        current_game = self.games[request["session_id"]]
 
         self.make_move(request)
 
         if self.check_win(request) is True or self.check_full_board(request) is True:
-            current_game.done = True
+            self.games[request["session_id"]].done = True
 
         return ConnectFourGame.read_game(self, request)
 
