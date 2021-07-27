@@ -26,8 +26,9 @@ class ConnectFourGame(GameInterface):
        """
 
         ConnectFourGame.sessions += 1
+        game = {"board": [], "player_to_play": 1, "session_id": ConnectFourGame.sessions}
 
-        self.games[ConnectFourGame.sessions] = Game([], 1, ConnectFourGame.sessions)
+        self.games[ConnectFourGame.sessions] = Game(game["board"], game["player_to_play"], game["session_id"])
 
         return {"session_id": self.games[ConnectFourGame.sessions].get_session_ID()}
 

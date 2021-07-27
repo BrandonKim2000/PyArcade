@@ -2,6 +2,7 @@ from pyarcade.proxy import ConnectFourGameProxy
 from pyarcade.connect_four import ConnectFourGame
 import unittest
 
+
 class ConnectFourTestCase(unittest.TestCase):
     """
     create_game tests
@@ -168,15 +169,11 @@ class ConnectFourTestCase(unittest.TestCase):
         proxy.create_game({"game_id": 2})
 
         reply = proxy.update_game({"session_id": 1, "column": 1})
-<<<<<<< HEAD
-        del reply.board
-        del reply.done
-        del reply.player_to_play
-=======
+
         del reply["board"]
         del reply["done"]
         del reply["player_to_play"]
->>>>>>> bkim_connect_four_and_menu_tests
+
         self.assertEqual(reply, {"session_id": 1})
 
     def test_proxy_update_game_integration_test_pass_row(self):

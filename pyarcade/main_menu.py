@@ -120,7 +120,8 @@ def play_minesweeper(session_id: int):
     game_in_session = True
     while game_in_session:
         msProxy.read_game({"session_id": session_id})
-        guess = input("Enter your guess as four integers separated by spaces\n")
+        print("Example input: X * Y (X up to 7, Y up to 7)")
+        guess = input("Enter your guess as 2 integers separated by spaces (similar to an array)\n")
         if guess == "quit":
             break
         guess = guess.split(" ")
